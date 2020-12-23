@@ -12,64 +12,64 @@ import path from 'path';
 const production = !process.env.ROLLUP_WATCH;
 
 function serve() {
-	let server;
+  let server;
 
-	function toExit() {
-		if (server) server.kill(0);
-	}
+  function toExit() {
+    if (server) server.kill(0);
+  }
 
-	return {
-		writeBundle() {
-			if (server) return;
-			server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
-				stdio: ['ignore', 'inherit', 'inherit'],
-				shell: true
-			});
+  return {
+    writeBundle() {
+      if (server) return;
+      server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
+        stdio: ['ignore', 'inherit', 'inherit'],
+        shell: true
+      });
 
-			process.on('SIGTERM', toExit);
-			process.on('exit', toExit);
-		}
-	};
+      process.on('SIGTERM', toExit);
+      process.on('exit', toExit);
+    }
+  };
 }
 
 export default {
-	input: 'src/main.js',
-	output: {
-		sourcemap: !production,
-		format: 'iife',
-		name: 'app',
-		file: path.resolve('public', 'build', 'bundle.js')
-	},
-	plugins: [
-		svelte({
-			compilerOptions: {
-				dev: !production
-			}
-		}),
-		babel({
-			extensions: [".js", ".mjs", ".html", ".svelte"],
-			babelHelpers: 'bundled'
-		}),
-		postcss({
-			extract: path.resolve('public', 'build', 'bundle.css'),
-			minimize: production,
-			sourceMap: !production,
-			config: {
-				path: 'postcss.config.js',
-			},
-		}),
-		resolve({
-			browser: true,
-			dedupe: ['svelte']
-		}),
-		commonjs(),
-		!production && serve(),
-		!production && livereload('public'),
-		production && terser(),
-		production && sizeSnapshot(),
-		progress(),
-	],
-	watch: {
-		clearScreen: false
-	}
+  input: 'src/main.js',
+  output: {
+    sourcemap: !production,
+    format: 'iife',
+    name: 'app',
+    file: path.resolve('public', 'build', 'bundle.js')
+  },
+  plugins: [
+    svelte({
+      compilerOptions: {
+        dev: !production
+      }
+    }),
+    babel({
+      extensions: [".js", ".mjs", ".html", ".svelte"],
+      babelHelpers: 'bundled'
+    }),
+    postcss({
+      extract: path.resolve('public', 'build', 'bundle.css'),
+      minimize: production,
+      sourceMap: !production,
+      config: {
+        path: 'postcss.config.js',
+      },
+    }),
+    resolve({
+      browser: true,
+      dedupe: ['svelte']
+    }),
+    commonjs(),
+    !production && serve(),
+    !production && livereload('public'),
+    production && terser(),
+    production && sizeSnapshot(),
+    progress(),
+  ],
+  watch: {
+    clearScreen: false
+  }
 };
